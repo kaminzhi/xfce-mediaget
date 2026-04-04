@@ -12,7 +12,6 @@ public:
         std::array<char, 128> buffer;
         std::string result;
         
-        // Fix: Use explicit function pointer type to avoid attribute warnings
         std::unique_ptr<FILE, int(*)(FILE*)> pipe(popen(cmd.c_str(), "r"), pclose);
         
         if (!pipe) return "";
