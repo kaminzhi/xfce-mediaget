@@ -1,0 +1,11 @@
+xfce-mediaget
+
+*.o
+*.obj
+
+*.a
+*.la
+*.so
+*.so.*
+*.dylib
+
