@@ -31,7 +31,14 @@ int main() {
     m.artist = Executor::run("playerctl metadata xesam:artist 2>/dev/null");
     m.title  = Executor::run("playerctl metadata xesam:title 2>/dev/null");
     m.player = Executor::run("playerctl -l 2>/dev/null | head -n 1");
+
+    std::string raw_url = Executor::run("playerctl metadata mpris:artUrl 2>/dev/null");
     m.art_url = Executor::run("playerctl metadata mpris:artUrl 2>/dev/null");
+    
+    if (!raw_url.empty()) {
+        m.art_url = Executor::download_art(raw_url);
+    }
+
 
     // std::string pos = format_time(Executor::run("playerctl position 2>/dev/null"));
     // std::string len = format_time(Executor::run("playerctl metadata mpris:length 2>/dev/null"));

@@ -21,6 +21,16 @@ public:
         if (!result.empty() && result.back() == '\n') result.pop_back();
         return result;
     }
+
+    static std::string download_art(const std::string& url) {
+        if (url.empty()) return "";
+        if (url.find("http") != 0) return url;
+
+        std::string tmp_path = "/tmp/xfce-mediaget-cover.jpg";
+        std::string cmd = "curl -s -o " + tmp_path + " \"" + url + "\"";
+        system(cmd.c_str());
+        return tmp_path;
+    }
 };
 
 #endif
