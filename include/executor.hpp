@@ -31,6 +31,33 @@ public:
         system(cmd.c_str());
         return tmp_path;
     }
+
+    static std::string process_art(const std::string& url, int w, int h) {
+        if (url.empty()) return "";
+        
+        std::string raw_path = "/tmp/xfce-mediaget-raw";
+        std::string thumb_path = "/tmp/xfce-mediaget-thumb.png";
+
+        std::string download_cmd;
+        if (url.find("http") == 0) {
+            download_cmd = "curl -s -L -o " + raw_path + " \"" + url + "\"";
+        } else {
+            std::string clean_url = url;
+            if (clean_url.find("file://") == 0) clean_url.erase(0, 7);
+            download_cmd = "cp \"" + clean_url + "\" " + raw_path;
+        }
+        if (std::system(download_cmd.c_str()) != 0) return "";
+
+        // -i: file_path
+        // -vf scale=-1:24
+        std::string size_str = std::to_string(w) + ":" + std::to_string(h);
+        std::string resize_cmd = "ffmpeg -y -v quiet -i " + raw_path + 
+                                " -vf \"scale=" + size_str + ":force_original_aspect_ratio=increase,crop=" + size_str + ",setsar=1\" " + 
+                                thumb_path;
+        std::system(resize_cmd.c_str());
+
+        return thumb_path;
+    }
 };
 
 #endif

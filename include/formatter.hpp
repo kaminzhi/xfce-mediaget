@@ -30,13 +30,21 @@ public:
             std::cout << "<img>" << img_path << "</img>" << std::endl;
         }
 
-        std::cout << "<txt> " << " " << utf8_truncate(m.title, 20) << " </txt>" << std::endl;
+        std::string display_text;
+        if (m.artist.empty() || m.artist == "Unknown Artist") {
+            display_text = " " + utf8_truncate(m.title, 25);
+        } else {
+            display_text = " " + utf8_truncate(m.title, 15) + "  " + utf8_truncate(m.artist, 10);
+        }
+
+        std::cout << "<txt> " << display_text << " </txt>" << std::endl;
 
         std::stringstream ss;
-        ss << "Artist: " << m.artist << "\n"
+        ss << "Artist: " << (m.artist.empty() ? "N/A" : m.artist) << "\n"
            << "Title:  " << m.title << "\n"
-           << "Source: " << m.player << "\n" ;
+           << "Source: " << m.player << "\n";
         //   << "Time:   " << m.time;
+
         
         std::cout << "<tool>" << ss.str() << "</tool>" << std::endl;
         std::cout << "<click>playerctl play-pause</click>" << std::endl;

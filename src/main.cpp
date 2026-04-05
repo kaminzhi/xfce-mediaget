@@ -1,51 +1,53 @@
 #include <iostream>
+#include <vector>
+#include <unistd.h>
 #include "executor.hpp"
 #include "formatter.hpp"
 #include "player.hpp"
+#include "utils.hpp"
 
-/*
-std::string format_time(std::string micro_str) {
-    if (micro_str.empty() || micro_str.find_first_not_of("0123456789") != std::string::npos) 
-        return "00:00";
-    try {
-        long long total_seconds = std::abs(std::stoll(micro_str) / 1000000);
-        // long long minutes = total_seconds / 60;
-        long long seconds = total_seconds % 60;
-        
-        char buf[32];
-        std::snprintf(buf, sizeof(buf), "%02lld:%02lld", seconds / 60, seconds % 60);
-        return std::string(buf);
-    } catch (...) {
-        return "00:00";
+int main(int argc, char* argv[]) {
+    int width = 150;
+    int height = 83;
+    int opt;
+
+    while ((opt = getopt(argc, argv, "w:h:")) != -1) {
+        switch (opt) {
+            case 'w': width = std::stoi(optarg); break;
+            case 'h': height = std::stoi(optarg); break;
+        }
     }
-}
-*/
+    
+    std::string players_raw = Executor::run("playerctl -l 2>/dev/null");
+    if (players_raw.empty()) return 0;
+    
+    std::vector<std::string> players = Utils::split(players_raw, '\n');
+    std::string target_player = "";
 
+    for (const auto& p : players) {
+        if (Executor::run("playerctl -p " + p + " status 2>/dev/null") == "Playing") {
+            target_player = p;
+            break;
+        }
+    }
+    if (target_player.empty()) target_player = players[0];
 
-int main() {
-    std::string status = Executor::run("playerctl status 2>/dev/null");
+    std::string status = Executor::run("playerctl -p " + target_player + " status 2>/dev/null");
     if (status != "Playing" && status != "Paused") return 0;
 
     PlayerMetadata m;
     // m.status = status;
-    m.artist = Executor::run("playerctl metadata xesam:artist 2>/dev/null");
-    m.title  = Executor::run("playerctl metadata xesam:title 2>/dev/null");
-    m.player = Executor::run("playerctl -l 2>/dev/null | head -n 1");
-
-    std::string raw_url = Executor::run("playerctl metadata mpris:artUrl 2>/dev/null");
-    m.art_url = Executor::run("playerctl metadata mpris:artUrl 2>/dev/null");
+    m.player = target_player;
+    m.artist = Executor::run("playerctl -p " + target_player + " metadata xesam:artist 2>/dev/null");
+    m.title  = Executor::run("playerctl -p " + target_player + " metadata xesam:title 2>/dev/null");
     
-    if (!raw_url.empty()) {
-        m.art_url = Executor::download_art(raw_url);
-    }
-
-
-    // std::string pos = format_time(Executor::run("playerctl position 2>/dev/null"));
-    // std::string len = format_time(Executor::run("playerctl metadata mpris:length 2>/dev/null"));
+    std::string raw_url = Executor::run("playerctl -p " + target_player + " metadata mpris:artUrl 2>/dev/null");
+    m.art_url = Executor::process_art(raw_url, width, height);
+    
+    // std::string pos = Utils::format_time(Executor::run("playerctl -p " + target_player + " position 2>/dev/null"));
+    // std::string len = Utils::format_time(Executor::run("playerctl -p " + target_player + " metadata mpris:length 2>/dev/null"));
     // m.time = pos + " / " + len;
 
-    // std::string icon = (status == "Playing") ? "󰐊" : "󰏤";
-    
     Formatter::print_genmon(m);
 
     return 0;
