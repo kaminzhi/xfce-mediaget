@@ -1,6 +1,8 @@
 # xfce-mediaget
 
-A tool for **XFCE Generic Monitor (GenMon)** that displays current media information with support for multiple players and automatic album art processing.
+A tool for **XFCE Generic Monitor (GenMon)** that displays media information for multiple players and automatic album art processing.
+
+<img width="1435" height="147" alt="2026-04-05-135129_hyprshot" src="https://github.com/user-attachments/assets/68968b5e-f841-49cd-a8d2-cc0aa7ba8d0d" />
 
 ---
 
