@@ -19,7 +19,10 @@ int main(int argc, char* argv[]) {
     }
     
     std::string players_raw = Executor::run("playerctl -l 2>/dev/null");
-    if (players_raw.empty()) return 0;
+    if (players_raw.empty()) {
+        std::cout << "<txt> No Media Playing </txt>" << std::endl;
+        return 0;
+    }
     
     std::vector<std::string> players = Utils::split(players_raw, '\n');
     std::string target_player = "";
