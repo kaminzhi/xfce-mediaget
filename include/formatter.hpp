@@ -34,7 +34,7 @@ public:
         if (m.artist.empty() || m.artist == "Unknown Artist") {
             display_text = " " + utf8_truncate(m.title, 25);
         } else {
-            display_text = " " + utf8_truncate(m.title, 15) + "  " + utf8_truncate(m.artist, 10);
+            display_text = " " + utf8_truncate(m.title, 20) + "  " + utf8_truncate(m.artist, 15);
         }
 
         std::cout << "<txt> " << display_text << " </txt>" << std::endl;
